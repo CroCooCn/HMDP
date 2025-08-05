@@ -1,0 +1,42 @@
+server:
+  port: 8081
+spring:
+  application:
+    name: hmdp
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/hmdp?useSSL=false&serverTimezone=UTC&characterEncoding=utf8&useUnicode=true
+    username: root
+    password: 123456
+  redis:
+    host: localhost
+    port: 6379
+    password: 
+    lettuce:
+      pool:
+        max-active: 10
+        max-idle: 10
+        min-idle: 1
+        time-between-eviction-runs: 10s
+  jackson:
+    default-property-inclusion: non_null # JSON处理时忽略非空字段
+
+# 阿里云短信配置
+# 阿里云账号 18140913796
+aliyun:
+  sms:
+    access-key-id: your_access_key_id        # 替换为你的AccessKey ID
+    access-key-secret: your_access_key_secret # 替换为你的AccessKey Secret
+    sign-name: 你的签名名称                    # 短信签名，需要在阿里云申请
+    template-code: SMS_XXXXXXXX              # 短信模板编码
+
+mybatis-plus:
+  type-aliases-package: com.hmdp.entity # 别名扫描包
+logging:
+  level:
+    com.hmdp: debug
+
+#使用redis还是session实现同样业务
+#来对比效果
+app: 
+  type: redis
