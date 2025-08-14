@@ -26,11 +26,11 @@ public class SessionStorageStrategy implements UserStorageStrategy{
 
 
 
-  @Override
-  public void saveCode(String phone,String code) {
-    //将"手机号-验证码"保存到session中
-    getSession().setAttribute(CODE_PREF+phone, code);
-  }
+    @Override
+    public void saveCode(String phone,String code) {
+        //将"手机号-验证码"保存到session中
+        getSession().setAttribute(CODE_PREF+phone, code);
+    }
 
     /**
      * 获取验证码
@@ -56,9 +56,9 @@ public class SessionStorageStrategy implements UserStorageStrategy{
     @Override
     public UserDTO getUser(String key){
        Object user = getSession().getAttribute("cur_user");
-    if (user == null) {
-        return null;
-    }
+        if (user == null) {
+            return null;
+        }
         // 使用BeanUtil将user属性拷贝到UserDTO对象
         return BeanUtil.copyProperties(user, UserDTO.class);
     }

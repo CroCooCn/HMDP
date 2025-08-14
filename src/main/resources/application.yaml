@@ -5,7 +5,7 @@ spring:
     name: hmdp
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/hmdp?useSSL=false&serverTimezone=UTC&characterEncoding=utf8&useUnicode=true
+    url: jdbc:mysql://localhost:3306/hmdp?useSSL=false&serverTimezone=UTC&characterEncoding=utf8&useUnicode=true&allowPublicKeyRetrieval=true
     username: root
     password: 123456
   redis:
@@ -36,7 +36,8 @@ logging:
   level:
     com.hmdp: debug
 
-#使用redis还是session实现同样业务
-#来对比效果
+#使用redis还是session实现“登录”相关业务的缓存
+#(仅供学习对比测试用)
+#其他情景下的缓存均使用redis
 app: 
   type: redis

@@ -1,10 +1,5 @@
 package com.hmdp.service.impl;
 
-import static com.hmdp.utils.RedisConstants.LOGIN_CODE_KEY;
-import static com.hmdp.utils.RedisConstants.LOGIN_CODE_TTL;
-
-import java.util.concurrent.TimeUnit;
-
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
 
@@ -15,15 +10,12 @@ import com.hmdp.dto.UserDTO;
 import com.hmdp.entity.User;
 import com.hmdp.mapper.UserMapper;
 import com.hmdp.service.IUserService;
+import com.hmdp.service.UserStorageStrategy;
 import com.hmdp.utils.RegexUtils;
-import com.hmdp.utils.SmsUtils;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.lang.UUID;
 import cn.hutool.core.util.RandomUtil;
 import lombok.extern.slf4j.Slf4j;
 
@@ -44,21 +36,21 @@ import lombok.extern.slf4j.Slf4j;
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IUserService {
     
     @Resource
-    private StringRedisTemplate stringRedisTemplate;
-    
-    @Autowired
-    private SmsUtils smsUtils;
+    private UserStorageStrategy storageStrategy;
     
     @Override
     public Result sendCode(String phone,HttpSession  session) {
+        //去处手机号开头结尾的空格
+        phone=phone.trim();
+
         //检查手机号码格式
         if(RegexUtils.isPhoneInvalid(phone))
             return Result.fail("手机号格式错误");
         //生成验证码
         String code=RandomUtil.randomNumbers(6);
-        //save code
-        stringRedisTemplate.opsForValue().set(LOGIN_CODE_KEY+phone,code,LOGIN_CODE_TTL,TimeUnit.MINUTES);
-        //不真的发送验证码
+        //保存验证码到session/redis
+        storageStrategy.saveCode(phone,code);
+        //先不真的发送验证码
 
         log.debug("发送验证码成功：{}",code);
         //运行到这里，说明没有问题
@@ -67,13 +59,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     
     public Result login(LoginFormDTO loginForm, HttpSession session) {
         //手机号是否正确
-        String phone=loginForm.getPhone();
+        String phone=loginForm.getPhone().trim();
         if(RegexUtils.isPhoneInvalid(phone))
             return Result.fail("手机号格式错误");
         //该手机号是否被发送了验证码，验证码是否正确
-        Object cor_code=session.getAttribute(phone);
-        String code=loginForm.getCode();
-        if(cor_code==null || !cor_code.toString().equals(code)) {
+        String savedCode=storageStrategy.getCode(phone);
+        String inputCode=loginForm.getCode().trim();
+        if(savedCode==null || !savedCode.equals(inputCode)) {
             return Result.fail("验证码错误");
         }
         //如果用户还未创建，先进行注册
@@ -84,12 +76,16 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             nuser.setNickName(RandomUtil.randomString(10));
             save(nuser);
             user=nuser;
+            log.debug("注册了新用户,存在数据库中,phone:"+phone);
+        }else {
+            log.debug("用户{}在数据库中已存在",phone);
         }
-        //保存用户信息（token格式）到redis中
-        //session.setAttribute("cur_user", BeanUtil.toBean(user, UserDTO.class));
-        String token=UUID.randomUUID().toString(true);
-        System.out.println(token);
-        return Result.ok();
+        //保存用户登录状态: redis-token session-无
+        String userKey=storageStrategy.generateUserKey();
+        UserDTO userDTO = BeanUtil.copyProperties(user, UserDTO.class);
+        storageStrategy.saveUser(userKey,userDTO);
+        return Result.ok(userKey);  //保存token到本地浏览器
+
     }
 
 }

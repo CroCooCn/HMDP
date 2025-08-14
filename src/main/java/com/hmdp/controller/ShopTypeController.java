@@ -1,15 +1,15 @@
 package com.hmdp.controller;
 
 
+import javax.annotation.Resource;
+
 import com.hmdp.dto.Result;
-import com.hmdp.entity.ShopType;
+import com.hmdp.service.IShopService;
 import com.hmdp.service.IShopTypeService;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import javax.annotation.Resource;
-import java.util.List;
 
 /**
  * <p>
@@ -25,10 +25,16 @@ public class ShopTypeController {
     @Resource
     private IShopTypeService typeService;
 
+    @Resource
+    public IShopService shopService;
+
     @GetMapping("list")
     public Result queryTypeList() {
+        /* 
         List<ShopType> typeList = typeService
                 .query().orderByAsc("sort").list();
         return Result.ok(typeList);
+        */
+        return shopService.queryTypeList();
     }
 }

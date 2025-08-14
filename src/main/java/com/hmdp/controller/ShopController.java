@@ -1,15 +1,24 @@
 package com.hmdp.controller;
 
 
-import cn.hutool.core.util.StrUtil;
+import javax.annotation.Resource;
+
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.hmdp.dto.Result;
 import com.hmdp.entity.Shop;
 import com.hmdp.service.IShopService;
 import com.hmdp.utils.SystemConstants;
-import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.Resource;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import cn.hutool.core.util.StrUtil;
 
 /**
  * <p>
@@ -33,11 +42,13 @@ public class ShopController {
      */
     @GetMapping("/{id}")
     public Result queryShopById(@PathVariable("id") Long id) {
-        return Result.ok(shopService.getById(id));
+        //return Result.ok(shopService.getById(id));
+        //改成使用redis缓存实现
+        return shopService.queryById(id);
     }
 
     /**
-     * 新增商铺信息
+     * 新增商铺信息（直接改数据库）
      * @param shop 商铺数据
      * @return 商铺id
      */
@@ -56,9 +67,8 @@ public class ShopController {
      */
     @PutMapping
     public Result updateShop(@RequestBody Shop shop) {
-        // 写入数据库
-        shopService.updateById(shop);
-        return Result.ok();
+        // 先改数据库，再删redis缓存
+        return shopService.updateshop(shop);
     }
 
     /**
@@ -97,5 +107,5 @@ public class ShopController {
                 .page(new Page<>(current, SystemConstants.MAX_PAGE_SIZE));
         // 返回数据
         return Result.ok(page.getRecords());
-    }
+    } 
 }
