@@ -23,7 +23,8 @@ public class SessionLoginInterceptor implements HandlerInterceptor{
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         //session方式：从session中取出user
         HttpSession session=request.getSession();
-        UserDTO user=userStorageStrategy.getUser(null);
+        //下面的参数不写也行
+        UserDTO user=userStorageStrategy.getUser("cur_user");
 
         //用户不存在，进行拦截
         if(user==null) {

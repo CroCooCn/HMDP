@@ -21,7 +21,7 @@ spring:
   jackson:
     default-property-inclusion: non_null # JSON处理时忽略非空字段
 
-# 阿里云短信配置
+# 阿里云短信配置 
 # 阿里云账号 18140913796
 aliyun:
   sms:
@@ -36,8 +36,6 @@ logging:
   level:
     com.hmdp: debug
 
-#使用redis还是session实现“登录”相关业务的缓存
-#(仅供学习对比测试用)
-#其他情景下的缓存均使用redis
 app: 
-  type: redis
+  type: redis #使用redis/session实现登录状态缓存
+  cache: logical-expire #使用互斥锁mutex还是逻辑过期logical-expire防止缓存击穿

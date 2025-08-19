@@ -19,7 +19,7 @@ public class RedisConstants {
     public static final String CACHE_SHOPTYPELIST_KEY="cache:shoptypelist";
 
     public static final String LOCK_SHOP_KEY = "lock:shop:";
-    public static final Long LOCK_SHOP_TTL = 10L;
+    public static final Long LOCK_SHOP_TTL = 10L;   //秒
 
     public static final String SECKILL_STOCK_KEY = "seckill:stock:";
     public static final String BLOG_LIKED_KEY = "blog:liked:";

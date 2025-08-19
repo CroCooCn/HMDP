@@ -40,7 +40,9 @@ public class MvcConfig implements WebMvcConfigurer{
             "/shop/**",
             "/shop-type/**",
             "/upload/**",
-            "/voucher/**"
+            "/voucher/**",
+            "/dbcount", 
+            "/resetdbcount"
         );
 
         //如果application.yaml中启用了redis，再开启RedisTokenFreshInterceptor
