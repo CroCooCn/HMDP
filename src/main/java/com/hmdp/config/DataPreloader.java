@@ -20,7 +20,7 @@ public class DataPreloader implements CommandLineRunner{
     
     @Override
     public void run(String...args) throws Exception {
-        if("logical-expire".equals(cacheConfig.getCache())) {
+        if("logical-expire".equals(cacheConfig.getBreakdown())) {
             shopService.preloadShopsToRedis();
         }
     }

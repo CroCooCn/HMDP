@@ -5,9 +5,9 @@ import org.springframework.stereotype.Component;
 
 import lombok.Data;
 
-@ConfigurationProperties(prefix = "app")
+@ConfigurationProperties(prefix = "app.cache")
 @Component
 @Data
 public class CacheConfig {
-    private String cache; 
+    private String login,breakdown,lock; 
 }

@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 @Component
-@ConditionalOnProperty(name="app.type",havingValue = "session")
+@ConditionalOnProperty(name="app.cache.login",havingValue = "session")
 public class SessionLoginInterceptor implements HandlerInterceptor{
     
     @Resource

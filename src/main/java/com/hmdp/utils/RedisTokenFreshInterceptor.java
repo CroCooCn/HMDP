@@ -19,7 +19,7 @@ import org.springframework.web.servlet.HandlerInterceptor;
 
 
 @Component
-@ConditionalOnProperty(name="app.type",havingValue = "redis")
+@ConditionalOnProperty(name="app.cache.login",havingValue = "redis")
 public class RedisTokenFreshInterceptor implements HandlerInterceptor{
     
     @Resource

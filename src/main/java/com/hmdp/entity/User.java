@@ -42,11 +42,11 @@ public class User implements Serializable {
      */
     private String password;
 
-    /**
+   /**
      * 昵称，默认是随机字符
      */
     private String nickName;
-
+ 
     /**
      * 用户头像
      */

@@ -26,7 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 // @Component 注解的作用是将当前类交给Spring容器管理，成为一个Spring Bean，便于在项目中通过依赖注入的方式使用该类。
 @Component
 @Slf4j
-@ConditionalOnProperty(name = "app.type",havingValue = "redis")
+@ConditionalOnProperty(name = "app.cache.login",havingValue = "redis")
 public class RedisStorageStrategy implements UserStorageStrategy{
   @Resource
   private StringRedisTemplate stringRedisTemplate;

@@ -1,6 +1,8 @@
 
+测试：redis+mutex方案
 
-redis/session配置错误的提示/兜底
+
+乐观锁/悲观锁双方案解决超卖
 
 
 拓展：

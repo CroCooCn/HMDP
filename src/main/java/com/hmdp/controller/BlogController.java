@@ -1,6 +1,7 @@
 package com.hmdp.controller;
 
 
+import com.baomidou.mybatisplus.extension.conditions.query.QueryChainWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.hmdp.dto.Result;
 import com.hmdp.dto.UserDTO;
@@ -79,5 +80,15 @@ public class BlogController {
             blog.setIcon(user.getIcon());
         });
         return Result.ok(records);
+    }
+
+    @GetMapping("{id}")
+    public Result queryBlog(@PathVariable("id") Long id) {
+        Blog blog = blogService.query().eq("id", id).one();
+        Long userId = blog.getUserId();
+        User user=userService.getById(userId);
+        blog.setName(user.getNickName());
+        blog.setIcon(user.getIcon());
+        return Result.ok(blog);
     }
 }

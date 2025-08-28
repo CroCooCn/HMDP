@@ -7,7 +7,9 @@ import static com.hmdp.utils.RedisConstants.CACHE_SHOP_KEY;
 import static com.hmdp.utils.RedisConstants.CACHE_SHOP_TTL;
 import static com.hmdp.utils.RedisConstants.LOCK_SHOP_KEY;
 import static com.hmdp.utils.RedisConstants.LOCK_SHOP_TTL;
+import static com.hmdp.utils.RedisConstants.LOCK_VALUE_PREF;
 
+import java.lang.management.ThreadInfo;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -31,6 +33,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import cn.hutool.core.lang.UUID;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
@@ -55,11 +58,12 @@ public class ShopServiceImpl extends ServiceImpl<ShopMapper, Shop> implements IS
     @Resource
     private CacheConfig cacheConfig;
 
+
     @Override
     public Result queryById(Long id) {
-        if("mutex".equals(cacheConfig.getCache())) {
+        if("mutex".equals(cacheConfig.getBreakdown())) {
             return queryByIdWithMutex(id);
-        }else if("logical-expire".equals(cacheConfig.getCache())) {
+        }else if("logical-expire".equals(cacheConfig.getBreakdown())) {
             return queryByIdWithLogicalExpire(id);
         }
         return Result.fail("配置文件中app:cache配置错误!");
@@ -90,8 +94,8 @@ public class ShopServiceImpl extends ServiceImpl<ShopMapper, Shop> implements IS
                 Thread.sleep(50); 
                 }catch(Exception e) {}                
             }
-            Result res=queryByIdWithMutex(id);   
-            stringRedisTemplate.delete(lock);
+            Result res=queryByIdWithMutex(id);
+            relLock(lock);
             return res;
         }
 
@@ -123,7 +127,7 @@ public class ShopServiceImpl extends ServiceImpl<ShopMapper, Shop> implements IS
             CACHE_SHOP_TTL, TimeUnit.MINUTES
         );
         //释放锁
-        stringRedisTemplate.delete(lock);
+        relLock(lock);
 
         return Result.ok(shop);
     }
@@ -152,7 +156,7 @@ public class ShopServiceImpl extends ServiceImpl<ShopMapper, Shop> implements IS
             //获取锁成功，开启独立线程，实现缓存重建
             CACHE_REBUILD_EXECUTOR.submit(() -> {
                 saveShopToRedis(id);
-                stringRedisTemplate.delete(lock);
+                relLock(lock);
                 //模拟延迟(TODO:测试用)
                 /*try {
                     Thread.sleep(200);
@@ -185,8 +189,17 @@ public class ShopServiceImpl extends ServiceImpl<ShopMapper, Shop> implements IS
     }
     
     boolean tryAddLock(String lock) {
-        Boolean success = stringRedisTemplate.opsForValue().setIfAbsent(lock,"locked",LOCK_SHOP_TTL,TimeUnit.SECONDS);
+        Boolean success = stringRedisTemplate.opsForValue().setIfAbsent(lock,
+        LOCK_VALUE_PREF+Thread.currentThread().getId(),
+        LOCK_SHOP_TTL,TimeUnit.SECONDS);
         return Boolean.TRUE.equals(success);
+    }
+
+    private boolean relLock(String key) {
+        String obtainedValue=stringRedisTemplate.opsForValue().get(key);
+        if((LOCK_VALUE_PREF+Thread.currentThread().getId()).equals(obtainedValue))   
+            return stringRedisTemplate.delete(key);
+        return false;
     }
 
     @Override

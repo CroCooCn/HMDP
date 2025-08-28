@@ -1,5 +1,7 @@
 package com.hmdp.utils;
 
+import cn.hutool.core.lang.UUID;
+
 public class RedisConstants {
     //在redis中储存发送的验证码（用phone区分）
     public static final String LOGIN_CODE_KEY = "login:code:";
@@ -18,8 +20,14 @@ public class RedisConstants {
     public static final Long CACHE_SHOPTYPE_TTL = 30L;
     public static final String CACHE_SHOPTYPELIST_KEY="cache:shoptypelist";
 
+    public static final String LOCK_VALUE_PREF=UUID.randomUUID(true).toString()+"-";
+
     public static final String LOCK_SHOP_KEY = "lock:shop:";
     public static final Long LOCK_SHOP_TTL = 10L;   //秒
+
+    public static final String LOCK_VOUCHER_KEY = "lock:voucher:";
+    public static final Long LOCK_VOUCHER_TTL = 10L;   //秒
+    
 
     public static final String SECKILL_STOCK_KEY = "seckill:stock:";
     public static final String BLOG_LIKED_KEY = "blog:liked:";

@@ -16,7 +16,7 @@ import cn.hutool.core.bean.BeanUtil;
 
 // @Component 注解的作用是将当前类交给Spring容器管理，成为一个Spring Bean，便于在项目中通过依赖注入的方式使用该类。
 @Component
-@ConditionalOnProperty(name = "app.type",havingValue = "session")
+@ConditionalOnProperty(name = "app.cache.login",havingValue = "session")
 public class SessionStorageStrategy implements UserStorageStrategy{
     private HttpSession getSession() {
         ServletRequestAttributes attr = (ServletRequestAttributes) 

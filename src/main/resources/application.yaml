@@ -37,5 +37,10 @@ logging:
     com.hmdp: debug
 
 app: 
-  type: redis #使用redis/session实现登录状态缓存
-  cache: logical-expire #使用互斥锁mutex还是逻辑过期logical-expire防止缓存击穿
+  cache:
+    #使用redis/session实现登录状态缓存
+    login: redis 
+    #使用互斥锁mutex还是逻辑过期logical-expire防止缓存击穿（查询数据的场景）
+    breakdown: logical-expire
+    #使用乐观锁optim还是悲观锁pessim防止超卖
+    lock: optim
